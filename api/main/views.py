@@ -5,7 +5,7 @@ from .serializer import ProjectSerializer, KanbanSerializer, TaskSerializer  # �
 from .models import Project, Kanban, Task
 
 # 1. Список/создание проектов
-class ProjectGetCreate(APIView):
+class ProjectMany(APIView):
     def get(self, request):
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
@@ -19,7 +19,7 @@ class ProjectGetCreate(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 2. Один проект (GET/PATCH/DELETE)
-class ProjectGetPatchDelete(APIView):
+class ProjectOne(APIView):
     def get(self, request, id):
         project = Project.objects.get(id=id)  # filter → get, objectsm → objects
         serializer = ProjectSerializer(project)  # many=False
@@ -53,7 +53,7 @@ class KanbanMany(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 4. Один канбан (GET/PATCH/DELETE)
-class KanbanGetPatchDelete(APIView):
+class KanbanOne(APIView):
     def get(self, request, id):
         kanban = Kanban.objects.get(id=id)  # Project → Kanban, objectsm → objects
         serializer = KanbanSerializer(kanban)
@@ -71,3 +71,34 @@ class KanbanGetPatchDelete(APIView):
         kanban = Kanban.objects.get(id=id)
         kanban.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)  # 400 → 204
+
+class TaskMany(APIView):
+    def get(self, request):
+        tasks  = Task.objects.all()
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data, status=200)
+    def post(self, request):
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TaskOne(APIView):
+    def get(self, request, id):
+        tasks = Task.objects.get(id=id) 
+        serializer = TaskSerializer(tasks)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, id):
+        tasks = Task.objects.get(id=id)
+        serializer = KanbanSerializer(tasks, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, id):
+        tasks = Task.objects.get(id=id)
+        tasks.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
