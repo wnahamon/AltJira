@@ -5,4 +5,4 @@ admin.site.register(Task)
 
 admin.site.register(Project)
 
-admin.site.register(Canban)
+admin.site.register(Kanban)

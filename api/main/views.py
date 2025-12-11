@@ -4,7 +4,7 @@ from rest_framework import status
 from .serializer import ProjectSerializer, KanbanSerializer, TaskSerializer  # Добавь сериализаторы
 from .models import Project, Kanban, Task
 
-# 1. Список/создание проектов
+
 class ProjectMany(APIView):
     def get(self, request):
         projects = Project.objects.all()
@@ -18,7 +18,7 @@ class ProjectMany(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# 2. Один проект (GET/PATCH/DELETE)
+
 class ProjectOne(APIView):
     def get(self, request, id):
         project = Project.objects.get(id=id)  # filter → get, objectsm → objects
