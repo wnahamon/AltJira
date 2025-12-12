@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Kanban, Project, Task
-from django.contrib.auth.models import User
+from .models import Kanban, Project, Task, User
+
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     participants_ids = serializers.PrimaryKeyRelatedField(
