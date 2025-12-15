@@ -1,4 +1,4 @@
-import {RouterProvider, createBrowserRouter} from "react-router-dom";
+import {createBrowserRouter} from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import Projects from "./pages/Projects";
 import Menu from "./pages/Menu";
@@ -8,6 +8,10 @@ export const router = createBrowserRouter([
         path: "/",
         element: <Layout/>,
         children: [
+            {
+                path: "/",
+                element: </>
+            },
             {
                 path: "/projects/",
                 element: <Projects/>
