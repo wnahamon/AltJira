@@ -1,23 +1,54 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response 
 from rest_framework import status
-from .serializer import ProjectSerializer, KanbanSerializer, TaskSerializer  # Добавь сериализаторы
+from rest_framework.permissions import AllowAny
+from .serializer import (
+    ProjectSerializer, KanbanSerializer,
+    TaskSerializer, RegistrationSerializer,
+    LoginSerializer
+    )
 from .models import Project, Kanban, Task
 
-
+class RegistrationAPIView(APIView):
+    permission_classes=(AllowAny,)
+    serializer_class = RegistrationSerializer
+    def post(self, req):
+        serializer = self.serializer_class(data=req.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data, 
+            status=201)
 class ProjectMany(APIView):
     def get(self, request):
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            serializer.data, 
+            status=status.HTTP_200_OK)
     
     def post(self, request):  # create → post
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.data, 
+                status=status.HTTP_201_CREATED)
+        return Response(
+            serializer.errors, 
+            status=status.HTTP_400_BAD_REQUEST)
 
+
+class LoginAPIView(APIView):
+    
+    serializer_class = LoginSerializer
+    def post(self, req):
+        serializer = self.serializer_class(data = req.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(
+            serializer.data,
+            status=200
+        )
 
 class ProjectOne(APIView):
     def get(self, request, id):
