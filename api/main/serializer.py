@@ -1,51 +1,38 @@
-from rest_framework import serializers
+from rest_framework import serializers  
 from .models import Kanban, Project, Task, User
 from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 
-class RegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        max_length = 128,
-        min_length = 8,
-        write_only = True
-    )
-    token = serializers.CharField(max_length=128, read_only=True)
-
-    class Meta:     
-        model = User
-        fields = ['email', 'username', 'password', 'token']
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+# TODO: Написать сериализаторы логина и регистрации
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.CharField(max_length=255)
-    password = serializers.CharField(max_length=128, write_only=True)
-    username = serializers.CharField(max_length=255, read_only=True)
-    token = serializers.CharField(max_length=255, read_only=True)
+    
+    class Meta:
+        model = User
+        fields = ['username', 'password']
     
     def validate(self, data):
-        email = data.get('email', None)
-        password = data.get('password', None)
+        user = authenticate(username=data['username'], password=data['password'])
+        if user:
+            return user
+        else:
+            raise serializers.ValidationError("Invalid credentials")
+            
+    
+class RegisterSerializer(serializers.Serializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
+    def create(self, validated_data):
+        if validated_data['password'] == validated_data['password_confirm']:
+            user = User.objects.create_user(
+                username=validated_data['username'],
+                password=validated_data['password']
+            )
+            return user
         
-        if email is None:
-            raise serializers.ValidationError('An email address is required to log in.')
         
-        if password is None:
-            raise serializers.ValidationError('A password is required to log in.')
-        
-        user = authenticate(username=email, password=password)
-        
-        if user is None:
-            raise serializers.ValidationError('A user with this email and password was not found.')
-        
-        if not user.is_active:
-            raise serializers.ValidationError(
-                "user with this email doesn't active"
-            ) 
-        return{
-            "email":user.email,
-            "username":user.username,
-            "token":user.token
-        }
     
     
 class ProjectSerializer(serializers.ModelSerializer):

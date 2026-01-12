@@ -9,4 +9,5 @@ urlpatterns = [
     path('tasks/', TaskMany.as_view()),
     path('tasks/<int:id>/', TaskOne.as_view()),
     path('reg/', RegistrationAPIView.as_view()),
+    path('login/', LoginAPIView.as_view()),
 ]

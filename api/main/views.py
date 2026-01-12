@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response 
 from rest_framework import status
+from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny
 from .serializer import (
     ProjectSerializer, KanbanSerializer,
@@ -9,25 +10,22 @@ from .serializer import (
     )
 from .models import Project, Kanban, Task
 
-class RegistrationAPIView(APIView):
-    permission_classes=(AllowAny,)
-    serializer_class = RegistrationSerializer
-    def post(self, req):
-        serializer = self.serializer_class(data=req.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(
-            serializer.data, 
-            status=201)
+# TODO: Написать регистрацию и логин 
+
+
+
+
+
+
 class ProjectMany(APIView):
     def get(self, request):
-        projects = Project.objects.all()
+        projects = Project.objects.filter(participants=request.user)
         serializer = ProjectSerializer(projects, many=True)
         return Response(
             serializer.data, 
             status=status.HTTP_200_OK)
     
-    def post(self, request):  # create → post
+    def post(self, request):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -39,16 +37,8 @@ class ProjectMany(APIView):
             status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginAPIView(APIView):
-    
-    serializer_class = LoginSerializer
-    def post(self, req):
-        serializer = self.serializer_class(data = req.data)
-        serializer.is_valid(raise_exception=True)
-        return Response(
-            serializer.data,
-            status=200
-        )
+
+
 
 class ProjectOne(APIView):
     def get(self, request, id):

@@ -4,8 +4,7 @@ import axios from 'axios'
 import './styles/FormLogin.scss'
 
 
-function FormLogin() {
-  const [isLogging, setIsLogging] = useState<Boolean>(false)
+function FormReg() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [email, setEmail] = useState<string>('');
@@ -13,7 +12,7 @@ function FormLogin() {
   const Authentication = async (event:any) => {
     event.preventDefault();
     try {
-      await axios.post("http//0.0.0.0:8000/api/login/", {username, password})
+      await axios.post("http//0.0.0.0:8000/api/reg/", {username, password, email})
       console.log('Успех')
     } catch (error) {
       console.error('Ошибка');
@@ -23,12 +22,14 @@ function FormLogin() {
   return (
     <>
         <form onSubmit={Authentication}>
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
-          <button type="submit">Login</button>
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+            <input type="email" value={password} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />    
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+
+          <button type="submit">Registration</button>
         </form>
     </>
   )
 }
 
-export default FormLogin
+export default FormReg
