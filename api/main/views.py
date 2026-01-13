@@ -33,16 +33,17 @@ class RegistrationAPI(APIView):
 class LoginAPI(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
+     
         if serializer.is_valid():
-            user = OurUser(
-                username=serializer.data['username'],
-                email=serializer.data['email'], 
-                password=serializer.data['password']
-            )
+            user = serializer.validated_data['user']
+            # login(request,)
             token, _ = Token.objects.get_or_create(user=user)
             return Response({
-                "user":user,
-                "token":token
+                "user":{
+                    "id":user.id,
+                    "username":user.username
+                    },  
+                "token":token.key
             })
         return Response({
             "erroe":serializer.errors
