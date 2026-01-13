@@ -2,17 +2,51 @@ from rest_framework.views import APIView
 from rest_framework.response import Response 
 from rest_framework import status
 from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from .serializer import (
     ProjectSerializer, KanbanSerializer,
-    TaskSerializer, RegistrationSerializer,
+    TaskSerializer, RegisterSerializer,
     LoginSerializer
     )
-from .models import Project, Kanban, Task
+from .models import Project, Kanban, Task, OurUser
 
 # TODO: Написать регистрацию и логин 
+# 😢
+class RegistrationAPI(APIView):
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()  # Создаёт и возвращает User-объект
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email
+                },
+                "token": token.key
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+    
+class LoginAPI(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = OurUser(
+                username=serializer.data['username'],
+                email=serializer.data['email'], 
+                password=serializer.data['password']
+            )
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                "user":user,
+                "token":token
+            })
+        return Response({
+            "erroe":serializer.errors
+        })
 
 
 
